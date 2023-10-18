@@ -1,13 +1,18 @@
 document.addEventListener("DOMContentLoaded", function(e) {
     document.querySelector("#contactCreate").addEventListener("click",function (event) {
         let name,tel;
-        name=document.querySelector("#inputName").value;
-        tel=document.querySelector("#inputTel").value;
-        contactListAdd(name,tel);
+        name=document.querySelector("#inputName");
+        tel=document.querySelector("#inputTel");
+
+        if (name.getAttribute("validated")==="true" && tel.getAttribute("validated")==="true") {
+            contactListAdd(name.value,tel.value);
+        } else {
+            alert("Not validated");
+        }
+        
     });
 
     document.querySelector(".validate-name").addEventListener("input",function (event) {
-        console.log(event);
         validate(event.target,"name");
     });
 
@@ -28,7 +33,8 @@ function contactListSave() {
 
 // Function: Add contact to list
 function contactListAdd(name,tel) {
-
+    console.log(name);
+    console.log(tel);
 }
 // Function: Delete contact from list
 function contactListDelete() {
@@ -66,17 +72,18 @@ function validate(element,type) {
 
 
     if (valid) {
+        element.setAttribute("validated",true);
         element.classList.remove("border-danger");
         element.classList.remove("focus-ring-danger");
         element.classList.add("focus-ring-success");
         element.classList.add("border-success");
     } else {
+        element.setAttribute("validated",false); 
         element.classList.remove("border-success");
         element.classList.remove("focus-ring-success");
         element.classList.add("focus-ring-danger");
         element.classList.add("border-danger");
     }
 
-    console.log(element);
     return valid;
 }
