@@ -38,14 +38,14 @@
             <ul id="contactList" class="list-group list-group-flush">
                 <li id="contactElementTemplate" class="d-none list-group-item">
                     <div class="input-group">
-                        <input type="text" class="editName form-control  focus-ring validate" disabled
+                        <input type="text" class="inputEditName form-control  focus-ring validate" disabled
                             placeholder="Ditt namn" data-validation-type="name">
-                        <input type="tel" class="editTel form-control focus-ring validate" disabled
+                        <input type="tel" class="inputEditTel form-control focus-ring validate" disabled
                             placeholder="0731234567" data-validation-type="tel">
                         <button class="btn btn-warning contactEdit" data-mode="edit">Ändra</button>
                         <button class="btn btn-danger contactDelete">Radera</button>
                     </div>
-                    <div class="alert alert-danger my-2" role="alert"></div>
+                    <div class="contactEditAlert alert alert-danger my-2 d-none" role="alert"></div>
                 </li>
             </ul>
         </div>

@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
     
     document.body.addEventListener('input', function (event) {
         if (event.target.classList.contains('validate')) {
-            validate(event.target, event.target.dataset.validationType);
+            validate(event.target);
         }
     });
     
@@ -37,12 +37,39 @@ function handleContactEdit(contactElement) {
         contactEditButton.innerHTML = 'Spara';
         inputFields.forEach(input => (input.disabled = false));
     } else if (contactEditMode === 'save') {
-        contactEditButton.setAttribute('data-mode', 'edit');
-        contactEditButton.classList.replace('btn-success', 'btn-warning');
-        contactEditButton.innerHTML = 'Ändra';
-        inputFields.forEach(input => (input.disabled = true));
+        let errors;
+        const nameElement=contactElement.querySelector(".inputEditName");
+        const telElement=contactElement.querySelector(".inputEditTel");
+        const alertElement = contactElement.querySelector('.contactEditAlert');
+        validate(telElement);
+        validate(nameElement);
+        errors=[];
+    
+        if (nameElement.getAttribute("data-validated")!=="true"){
+            errors.push("Ange ett korrekt namn!");
+        }
+        if (telElement.getAttribute("data-validated")!=="true"){
+            errors.push("Ange ett korrekt telefonnummer!");
+        }
 
-        
+         if(errors.length===0){
+            // Hide error element
+            alertElement.classList.add("d-none");
+            contactEditButton.setAttribute('data-mode', 'edit');
+            contactEditButton.classList.replace('btn-success', 'btn-warning');
+            contactEditButton.innerHTML = 'Ändra';
+            inputFields.forEach(input => (input.disabled = true));
+
+            // Clear input borders
+            inputSetBorder(nameElement,"normal");
+            inputSetBorder(telElement,"normal");
+            
+         } else {
+            // Show error element
+            alertElement.classList.remove("d-none");
+            // Output errors
+            alertElement.innerHTML=errors.join("<br>");
+         }
     }
 }
 
@@ -51,17 +78,15 @@ function handleContactCreate() {
     let errors,alertElement;
     const nameElement=document.querySelector("#inputName");
     const telElement=document.querySelector("#inputTel");
+    validate(telElement);
+    validate(nameElement);
     alertElement = document.querySelector('#contactCreateAlert');
     errors=[];
 
     if (nameElement.getAttribute("data-validated")!=="true"){
-        // Set error border, necessary if no input
-        inputSetBorder(nameElement,"danger");
         errors.push("Ange ett korrekt namn!");
     }
     if (telElement.getAttribute("data-validated")!=="true"){
-        // Set error border, necessary if no input
-        inputSetBorder(telElement,"danger");
         errors.push("Ange ett korrekt telefonnummer!");
     }
 
@@ -119,8 +144,8 @@ function contactListAdd(name,tel) {
     clonedElement.classList.remove("d-none");
     
     // Add name and telephone to the inputs
-    clonedElement.querySelector("input.editName").value = name;
-    clonedElement.querySelector("input.editTel").value = tel;
+    clonedElement.querySelector(".inputEditName").value = name;
+    clonedElement.querySelector(".inputEditTel").value = tel;
 
     // Set contactID
     clonedElement.setAttribute("data-contactID", "custom-value");
@@ -151,7 +176,8 @@ function contactListEdit() {
 }
 
 
-function validate(element,type) {
+function validate(element) {
+    type=element.dataset.validationType;
     let valid = true;
     let value = element.value;
     let pattern="";
