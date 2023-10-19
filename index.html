@@ -18,7 +18,7 @@
 
 
 
-    <div class="card mx-auto col-md-4 my-2">
+    <div class="card mx-auto col-md-6 col-lg-5 col-xl-4 my-2">
         <div class="card-header">
             Kontaktlista
         </div>
@@ -32,14 +32,15 @@
                     class="form-control  focus-ring validate-tel" id="inputTel">
                 <button class="btn btn-primary" id="contactCreate">Skapa kontakt</button>
             </div>
-
-            <ul id="contactList" class="my-2">
-                <li id="contactElementTemplate" class="d-none">
+            <br>
+            <ul id="contactList" class="list-group list-group-flush">
+                <li id="contactElementTemplate" class="d-none list-group-item">
                     <div class="input-group">
-                        <input type="text" class="editName form-control" placeholder="Ditt namn">
-                        <input type="tel" class="editTel form-control" placeholder="123456">
-                        <button class="btn btn-warning">Ändra</button>
-                        <button class="btn btn-danger">Radera</button>
+                        <input type="text" class="editName form-control" disabled placeholder="Ditt namn">
+                        <input type="tel" class="editTel form-control" disabled placeholder="0731234567">
+                        <button class="btn btn-success contactSave d-none">Spara</button>
+                        <button class="btn btn-warning contactEdit">Ändra</button>
+                        <button class="btn btn-danger contactDelete">Radera</button>
                     </div>
                 </li>
             </ul>

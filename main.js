@@ -13,14 +13,44 @@ document.addEventListener("DOMContentLoaded", function(e) {
         
     });
 
+
+
+    // Validate
     document.querySelector(".validate-name").addEventListener("input",function (event) {
         validate(event.target,"name");
     });
-
+    // Validate
     document.querySelector(".validate-tel").addEventListener("input",function (event) {
         validate(event.target,"tel");
     });
+
+    // Add listener to contactList since list elements are dynamicly added
+    document.getElementById('contactList').addEventListener('click', function(event) {
+        let contactElement = event.target.closest('li');
+
+        // Edit contact element
+        if (event.target.classList.contains('contactEdit')) {
+            let contactSaveButton = contactElement.querySelector('.contactSave');
+            contactSaveButton.classList.remove("d-none");
+            event.target.classList.add("d-none");
+
+            contactElement.querySelectorAll('input');
+            let inputFields= contactElement.querySelectorAll('input');
+            inputFields.forEach(function(input) {
+                input.removeAttribute('disabled');
+            });
+        }
+
+        // Delete contact element
+        if (event.target.classList.contains('contactDelete')) {
+            contactElement.remove();
+        }
+    });
+
+    
 });
+
+
 
 // Function: Load contactlist from local storage
 function contactListLoad() {
@@ -44,7 +74,7 @@ function contactListAdd(name,tel) {
 
     // Make it visible by removing hide-class
     clonedElement.classList.remove("d-none");
-
+    
     // Add name and telephone to the inputs
     clonedElement.querySelector("input.editName").value = name;
     clonedElement.querySelector("input.editTel").value = tel;
@@ -54,6 +84,7 @@ function contactListAdd(name,tel) {
 
     contactList.appendChild(clonedElement);
 }
+
 // Function: Delete contact from list
 function contactListDelete() {
     
