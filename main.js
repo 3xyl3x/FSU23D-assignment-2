@@ -1,231 +1,161 @@
-document.addEventListener("DOMContentLoaded", function (e) {
+// Wait for DOM to be loaded before adding listeners
+document.addEventListener('DOMContentLoaded', function () {
+    // Reference to the contactlist
+    const contactList = document.getElementById('contactList');    
 
-    document.querySelector("#contactCreate").addEventListener("click", handleContactCreate);
-    
-    document.querySelector("#contactsClear").addEventListener("click", contactListClear);
+    // Listeners for create contact and clear list buttons
+    document.querySelector('#contactCreate').addEventListener('click', contactCreate);
+    document.querySelector('#contactsClear').addEventListener('click', contactListClear);
 
+    // Listener for input on body that targets all inputs with .validate class
     document.body.addEventListener('input', function (event) {
         if (event.target.classList.contains('validate')) {
             validate(event.target);
         }
     });
-
-    // Add listener to contactList since list elements are dynamically added
-    document.getElementById('contactList').addEventListener('click', function (event) {
+    
+    // Listener for clicks on contactlist made on edit and delete a contact
+    contactList.addEventListener('click', function (event) {
         const contactElement = event.target.closest('li');
         if (event.target.classList.contains('contactEdit')) {
-            handleContactEdit(contactElement);
+            contactEdit(contactElement);
         } else if (event.target.classList.contains('contactDelete')) {
-            handleContactDelete(contactElement);
+            contactDelete(contactElement);
         }
     });
 });
 
-function handleContactDelete(contactElement) {
-    // Could do a modal prompt here before calling contactListDelete
-    contactListDelete(contactElement);
-}
 
-function handleContactEdit(contactElement) {
+function contactEdit(contactElement) {
     const inputFields = contactElement.querySelectorAll('input');
     const contactEditButton = contactElement.querySelector('.contactEdit');
-    const contactEditMode = contactEditButton.getAttribute('data-mode');
+    const contactEditMode = contactEditButton.dataset.mode;
 
+    // Check which mode button is currently in
     if (contactEditMode === 'edit') {
-        contactEditButton.setAttribute('data-mode', 'save');
+        // Make inputs editable
+        inputFields.forEach(input => (input.disabled = false));
         contactEditButton.classList.replace('btn-warning', 'btn-success');
         contactEditButton.innerHTML = 'Spara';
-        inputFields.forEach(input => (input.disabled = false));
+        // Switch to 'save' mode.
+        contactEditButton.dataset.mode='save';
     } else if (contactEditMode === 'save') {
-        const nameElement = contactElement.querySelector(".inputEditName");
-        const telElement = contactElement.querySelector(".inputEditTel");
+        const nameElement = contactElement.querySelector('.inputEditName');
+        const telElement = contactElement.querySelector('.inputEditTel');
         const alertElement = contactElement.querySelector('.contactEditAlert');
-        validate(telElement);
-        validate(nameElement);
         const errors = [];
 
-        if (nameElement.getAttribute("data-validated") !== "true") {
-            errors.push("Ange ett korrekt namn!");
-        }
-        if (telElement.getAttribute("data-validated") !== "true") {
-            errors.push("Ange ett korrekt telefonnummer!");
-        }
+        // Validate name and telephone.
+        validate(telElement);
+        validate(nameElement);
 
+        
+        // Check if validation fails.
+        if (nameElement.dataset.validated !== 'true') {
+            errors.push('Ange ett korrekt namn!');
+        }
+        if (telElement.dataset.validated !== 'true') {
+            errors.push('Ange ett korrekt telefonnummer!');
+        }
+        
+        // No errors
         if (errors.length === 0) {
-            // Hide error element
-            alertElement.classList.add("d-none");
-            contactEditButton.setAttribute('data-mode', 'edit');
+            // Hide alert and switch back to 'edit' mode.
+            alertElement.classList.add('d-none');
+            contactEditButton.dataset.mode='edit';
             contactEditButton.classList.replace('btn-success', 'btn-warning');
             contactEditButton.innerHTML = 'Ändra';
+            // Disable inputs
             inputFields.forEach(input => (input.disabled = true));
-
-            // Clear input borders
-            inputSetBorder(nameElement, "normal");
-            inputSetBorder(telElement, "normal");
-
+            inputSetBorder(nameElement, 'normal');
+            inputSetBorder(telElement, 'normal');
         } else {
-            // Show error element
-            alertElement.classList.remove("d-none");
-            // Output errors
-            alertElement.innerHTML = errors.join("<br>");
+            // Show errors.
+            alertElement.classList.remove('d-none');
+            alertElement.innerHTML = errors.join('<br>');
         }
     }
 }
 
-function handleContactCreate() {
-    const nameElement = document.querySelector("#inputName");
-    const telElement = document.querySelector("#inputTel");
-    validate(telElement);
-    validate(nameElement);
+
+function contactCreate() {
+    const nameElement = document.querySelector('#inputName');
+    const telElement = document.querySelector('#inputTel');
     const alertElement = document.querySelector('#contactCreateAlert');
     const errors = [];
 
-    if (nameElement.getAttribute("data-validated") !== "true") {
-        errors.push("Ange ett korrekt namn!");
-    }
-    if (telElement.getAttribute("data-validated") !== "true") {
-        errors.push("Ange ett korrekt telefonnummer!");
-    }
+    // Validate name and telephone.
+    validate(nameElement);
+    validate(telElement);
 
-    // No errors
+    // Check if validation fails.
+    if (nameElement.dataset.validated !== 'true') {
+        errors.push('Ange ett korrekt namn!');
+    }
+    if (telElement.dataset.validated !== 'true') {
+        errors.push('Ange ett korrekt telefonnummer!');
+    }
+     // No errors
     if (errors.length === 0) {
-        // Add the contact
         contactListAdd(nameElement.value, telElement.value);
-        // Hide error element
-        alertElement.classList.add("d-none");
-
-        // Clear input values
-        nameElement.value = "";
-        telElement.value = "";
-
-        // Clear input borders
-        inputSetBorder(nameElement, "normal");
-        inputSetBorder(telElement, "normal");
-
-        // clear validation
-        nameElement.setAttribute("data-validated", false);
-        telElement.setAttribute("data-validated", false);
+        alertElement.classList.add('d-none');
+        nameElement.value = '';
+        telElement.value = '';
+        inputSetBorder(nameElement, 'normal');
+        inputSetBorder(telElement, 'normal');
+        nameElement.dataset.validated=false;
+        telElement.dataset.validated=false;
     } else {
-        // Show error element
-        alertElement.classList.remove("d-none");
-        // Output errors
-        alertElement.innerHTML = errors.join("<br>");
+         // Show errors.
+        alertElement.classList.remove('d-none');
+        alertElement.innerHTML = errors.join('<br>');
     }
 }
 
-
-// Function: Add contact to list
 function contactListAdd(name, tel) {
-    // Get contactList element
-    const contactList = document.getElementById("contactList");
-    // Create a clone of the contact element
-    const clonedElement = document.getElementById("contactElementTemplate").cloneNode(true);
+    const clonedElement = document.getElementById('contactElementTemplate').cloneNode(true);
+    
+    clonedElement.classList.add('contactElement');
+    clonedElement.classList.remove('d-none');
 
-    // Make it visible by removing hide-class
-    clonedElement.classList.add("contactElement");
-
-    // Make it visible by removing hide-class
-    clonedElement.classList.remove("d-none");
-
-    // Add name and telephone to the inputs
-    clonedElement.querySelector(".inputEditName").value = name;
-    clonedElement.querySelector(".inputEditTel").value = tel;
-
-    // Set contactID
-    clonedElement.setAttribute("data-contactID", "custom-value");
-
+    clonedElement.querySelector('.inputEditName').value = name;
+    clonedElement.querySelector('.inputEditTel').value = tel;
+    
     contactList.appendChild(clonedElement);
-
- 
-    // Show clear button.
-    document.querySelector("#contactsClear").classList.remove("d-none");
+    document.querySelector('#contactsClear').classList.remove('d-none');
 }
 
-// Function: Delete contact from list
-function contactListDelete(contactElement) {
+function contactDelete(contactElement) {
+    // Remove element
     contactElement.remove();
-
-
-    // Hide clear button if no more contacts
-    if (document.querySelectorAll('.contactElement').length === 0)
-        document.querySelector("#contactsClear").classList.add("d-none");
+    // Hide clear list button if there is no more elements left
+    if (document.querySelectorAll('.contactElement').length === 0) {
+        document.querySelector('#contactsClear').classList.add('d-none');
+    }
 }
 
-// Function: Delete all contacts
 function contactListClear() {
-    // Implement this function if needed
-    const contactList = document.getElementById("contactList");
-    
-    // Remove all contact elements
+    // Run delete contact function on all elements
     const contactElements = contactList.querySelectorAll('.contactElement');
-    contactElements.forEach(contactElement => contactElement.remove());
-    
-    // Save list
-    contactListSave();
-
-    // Hide the clear button
-    document.querySelector("#contactsClear").classList.add("d-none");
+    contactElements.forEach(contactElement => contactDelete(contactElement));
 }
 
-// Function: Edit contact in list
-function contactListEdit() {
-    // Implement this function if needed
-
-    // Save list
-    contactListSave();
-}
 
 function validate(element) {
-    const type = element.dataset.validationType;
-    let valid = true;
-    const value = element.value;
-    let pattern = "";
-
-    switch (type) {
-        case "tel":
-            pattern = /^(0|\+)[0-9+-]{8,}$/;
-            break;
-        case "name":
-            pattern = /^[\p{L}\s'\-]{3,}$/u;
-            break;
-    }
-
-    // Test the input value with a regular expression
-    valid = pattern.test(value);
-
-    if (valid) {
-        element.setAttribute("data-validated", true);
-        inputSetBorder(element, "success");
-    } else {
-        element.setAttribute("data-validated", false);
-        inputSetBorder(element, "danger");
-    }
-
-    console.log(`Validating input. [value=${value}]  [valid=${valid}]`);
-    return valid;
+    // Regex patterns 
+    const patterns = {
+        'tel': /^(0|\+)[0-9+-]{8,}$/,
+        'name': /^[\p{L}\s'\-]{3,}$/u
+    };
+    // Check which validation type the input element has and use that pattern to test the value. 
+    const valid = patterns[element.dataset.validationType].test(element.value);
+    // Set the attribute to the result
+    element.dataset.validated=valid;
+    inputSetBorder(element, valid ? 'success' : 'danger');
 }
 
-
-// Function
 function inputSetBorder(inputElement, borderType) {
-    switch (borderType) {
-        case "normal":
-            inputElement.classList.remove("border-success");
-            inputElement.classList.remove("focus-ring-success");
-            inputElement.classList.remove("border-danger");
-            inputElement.classList.remove("focus-ring-danger");
-            break;
-        case "danger":
-            inputElement.classList.remove("border-success");
-            inputElement.classList.remove("focus-ring-success");
-            inputElement.classList.add("focus-ring-danger");
-            inputElement.classList.add("border-danger");
-            break;
-        case "success":
-            inputElement.classList.remove("border-danger");
-            inputElement.classList.remove("focus-ring-danger");
-            inputElement.classList.add("focus-ring-success");
-            inputElement.classList.add("border-success");
-            break;
-    }
+    inputElement.classList.remove('border-success', 'focus-ring-success', 'border-danger', 'focus-ring-danger');
+    inputElement.classList.add(`focus-ring-${borderType}`, `border-${borderType}`);
 }
+
