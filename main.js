@@ -36,7 +36,8 @@ function contactEdit(contactElement) {
         // Make inputs editable
         inputFields.forEach(input => (input.disabled = false));
         contactEditButton.classList.replace('btn-warning', 'btn-success');
-        contactEditButton.innerHTML = 'Spara';
+        contactEditButton.querySelector('.editIcon').classList.add("d-none");
+        contactEditButton.querySelector('.saveIcon').classList.remove("d-none");
         // Switch to 'save' mode.
         contactEditButton.dataset.mode='save';
     } else if (contactEditMode === 'save') {
@@ -64,7 +65,8 @@ function contactEdit(contactElement) {
             alertElement.classList.add('d-none');
             contactEditButton.dataset.mode='edit';
             contactEditButton.classList.replace('btn-success', 'btn-warning');
-            contactEditButton.innerHTML = 'Ändra';
+            contactEditButton.querySelector('.editIcon').classList.remove("d-none");
+            contactEditButton.querySelector('.saveIcon').classList.add("d-none");
             // Disable inputs
             inputFields.forEach(input => (input.disabled = true));
             inputSetBorder(nameElement, 'normal');
