@@ -1,54 +1,110 @@
 document.addEventListener("DOMContentLoaded", function(e) {
-    document.querySelector("#contactCreate").addEventListener("click",function (event) {
-        let name,tel;
-        name=document.querySelector("#inputName");
-        tel=document.querySelector("#inputTel");
-
-        if (name.getAttribute("data-validated")==="true" && tel.getAttribute("data-validated")==="true") {
-            contactListAdd(name.value,tel.value);
-        } else {
-            contactListAdd(name.value,tel.value);
-            //alert("Not validated");
-        }
-        
+    
+    document.querySelector("#contactCreate").addEventListener("click", handleContactCreate);
+    document.querySelectorAll('.validate').forEach(input => {
+        input.addEventListener('input', event => validate(event.target, event.target.dataset.validationType));
     });
+    
 
-
-
-    // Validate
-    document.querySelector(".validate-name").addEventListener("input",function (event) {
-        validate(event.target,"name");
-    });
-    // Validate
-    document.querySelector(".validate-tel").addEventListener("input",function (event) {
-        validate(event.target,"tel");
-    });
 
     // Add listener to contactList since list elements are dynamicly added
     document.getElementById('contactList').addEventListener('click', function(event) {
-        let contactElement = event.target.closest('li');
+
 
         // Edit contact element
         if (event.target.classList.contains('contactEdit')) {
-            let contactSaveButton = contactElement.querySelector('.contactSave');
-            contactSaveButton.classList.remove("d-none");
-            event.target.classList.add("d-none");
-
-            contactElement.querySelectorAll('input');
-            let inputFields= contactElement.querySelectorAll('input');
-            inputFields.forEach(function(input) {
-                input.removeAttribute('disabled');
-            });
+            handleContactEdit(event);
         }
 
         // Delete contact element
         if (event.target.classList.contains('contactDelete')) {
-            contactElement.remove();
+        
+            handleContactDelete(event);
         }
     });
 
     
 });
+
+function handleContactDelete(event) {
+    let contactElement = event.target.closest('li');
+
+    contactElement.remove();
+}
+
+function handleContactEdit(event) {
+    let contactElement = event.target.closest('li');
+    let inputFields= contactElement.querySelectorAll('input');
+    let contactEditButton = event.target;
+    let contactEditMode = contactEditButton.getAttribute("data-mode");
+
+    switch(contactEditMode) {
+        case "edit":
+            contactEditButton.setAttribute("data-mode","save");
+            contactEditButton.classList.remove("btn-warning");
+            contactEditButton.classList.add("btn-success");
+            console.log(contactEditButton.classList);
+            contactEditButton.innerHTML="Spara";
+            inputFields.forEach(input => input.disabled = false);
+        break;
+        case "save":
+            contactEditButton.setAttribute("data-mode","edit");
+            contactEditButton.classList.remove("btn-success");
+            contactEditButton.classList.add("btn-warning");
+            contactEditButton.innerHTML="Ändra";
+            inputFields.forEach(input => input.disabled = true);
+        break;
+    }
+
+    
+}
+
+
+function handleContactCreate() {
+    let name,tel,errors,alertElement;
+    name=document.querySelector("#inputName");
+    tel=document.querySelector("#inputTel");
+    alertElement = document.querySelector('#contactCreateAlert');
+    errors=[];
+
+    if (name.getAttribute("data-validated")!=="true"){
+        // Set error border, necessary if no input
+        inputSetBorder(name,"danger");
+        errors.push("Ange ett korrekt namn!");
+    }
+    if (tel.getAttribute("data-validated")!=="true"){
+        // Set error border, necessary if no input
+        inputSetBorder(tel,"danger");
+        errors.push("Ange ett korrekt telefonnummer!");
+    }
+
+    // No errors
+    if(errors.length===0){
+        // Add the contact
+        contactListAdd(name.value,tel.value);
+        // Hide error element
+        alertElement.classList.add("d-none");
+
+        // Clear input values
+        name.value="";
+        tel.value="";
+
+        // Clear input borders
+        inputSetBorder(name,"normal");
+        inputSetBorder(tel,"normal");
+
+        // clear validation
+        name.setAttribute("data-validated",false);
+        tel.setAttribute("data-validated",false);
+    } else {
+        // Show error element
+        alertElement.classList.remove("d-none");
+        // Output errors
+        alertElement.innerHTML=errors.join("<br>");
+    }
+    
+}
+
 
 
 
@@ -103,16 +159,14 @@ function contactListEdit() {
 function validate(element,type) {
     let valid = true;
     let value = element.value;
-    let errorMessage="";
     let pattern="";
     switch (type){
         case "tel":
             pattern=/^(0|\+)[0-9+-]{8,}$/;
-            errorMessage ="Ej giltligt telefonnummer";
+
         break;
         case "name":
             pattern =/^[\p{L}\s'\-]{3,}$/u;
-            errorMessage ="Ej giltligt namn";
         break;
     }
 
@@ -121,18 +175,35 @@ function validate(element,type) {
 
 
     if (valid) {
-        element.setAttribute("validated",true);
-        element.classList.remove("border-danger");
-        element.classList.remove("focus-ring-danger");
-        element.classList.add("focus-ring-success");
-        element.classList.add("border-success");
+        element.setAttribute("data-validated",true);
+        inputSetBorder(element,"success");
     } else {
-        element.setAttribute("validated",false); 
-        element.classList.remove("border-success");
-        element.classList.remove("focus-ring-success");
-        element.classList.add("focus-ring-danger");
-        element.classList.add("border-danger");
+        element.setAttribute("data-validated",false); 
+        inputSetBorder(element,"danger");
     }
 
     return valid;
+}
+
+function inputSetBorder(inputElement,borderType) {
+    switch (borderType) {
+        case "normal":
+            inputElement.classList.remove("border-success");
+            inputElement.classList.remove("focus-ring-success");
+            inputElement.classList.remove("border-danger");
+            inputElement.classList.remove("focus-ring-danger");
+        break;
+        case "danger":
+            inputElement.classList.remove("border-success");
+            inputElement.classList.remove("focus-ring-success");
+            inputElement.classList.add("focus-ring-danger");
+            inputElement.classList.add("border-danger");
+        break;
+        case "success":
+            inputElement.classList.remove("border-danger");
+            inputElement.classList.remove("focus-ring-danger");
+            inputElement.classList.add("focus-ring-success");
+            inputElement.classList.add("border-success");
+        break;
+    }
 }

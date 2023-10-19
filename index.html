@@ -26,22 +26,26 @@
 
 
             <div class="input-group ">
-                <input type="text" placeholder="Namn" validated="false" class="form-control focus-ring validate-name"
-                    id="inputName">
-                <input type="tel" placeholder="Telefonnummer" validated="false"
-                    class="form-control  focus-ring validate-tel" id="inputTel">
+                <input type="text" placeholder="Namn" data-validated="false" data-validation-type="name"
+                    class="form-control focus-ring validate" id="inputName">
+                <input type="tel" placeholder="Telefonnummer" data-validated="false" data-validation-type="tel"
+                    class="form-control  focus-ring validate" id="inputTel">
                 <button class="btn btn-primary" id="contactCreate">Skapa kontakt</button>
             </div>
-            <br>
+
+            <div id="contactCreateAlert" class="alert alert-danger my-2 d-none" role="alert"></div>
+
             <ul id="contactList" class="list-group list-group-flush">
                 <li id="contactElementTemplate" class="d-none list-group-item">
                     <div class="input-group">
-                        <input type="text" class="editName form-control" disabled placeholder="Ditt namn">
-                        <input type="tel" class="editTel form-control" disabled placeholder="0731234567">
-                        <button class="btn btn-success contactSave d-none">Spara</button>
-                        <button class="btn btn-warning contactEdit">Ändra</button>
+                        <input type="text" class="editName form-control  focus-ring validate" disabled
+                            placeholder="Ditt namn" data-validation-type="name">
+                        <input type="tel" class="editTel form-control focus-ring validate" disabled
+                            placeholder="0731234567" data-validation-type="tel">
+                        <button class="btn btn-warning contactEdit" data-mode="edit">Ändra</button>
                         <button class="btn btn-danger contactDelete">Radera</button>
                     </div>
+                    <div class="alert alert-danger my-2" role="alert"></div>
                 </li>
             </ul>
         </div>
