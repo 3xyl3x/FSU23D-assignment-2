@@ -4,10 +4,11 @@ document.addEventListener("DOMContentLoaded", function(e) {
         name=document.querySelector("#inputName");
         tel=document.querySelector("#inputTel");
 
-        if (name.getAttribute("validated")==="true" && tel.getAttribute("validated")==="true") {
+        if (name.getAttribute("data-validated")==="true" && tel.getAttribute("data-validated")==="true") {
             contactListAdd(name.value,tel.value);
         } else {
-            alert("Not validated");
+            contactListAdd(name.value,tel.value);
+            //alert("Not validated");
         }
         
     });
@@ -33,8 +34,25 @@ function contactListSave() {
 
 // Function: Add contact to list
 function contactListAdd(name,tel) {
-    console.log(name);
-    console.log(tel);
+    // Get contactList element
+    let contactList = document.getElementById("contactList");
+    // Create a clone of contact element
+    let clonedElement = document.getElementById("contactElementTemplate").cloneNode(true);
+
+    // Set new ID
+    clonedElement.id = "newContact"; 
+
+    // Make it visible by removing hide-class
+    clonedElement.classList.remove("d-none");
+
+    // Add name and telephone to the inputs
+    clonedElement.querySelector("input.editName").value = name;
+    clonedElement.querySelector("input.editTel").value = tel;
+
+    // Set contactID
+    clonedElement.setAttribute("data-contactID", "custom-value");
+
+    contactList.appendChild(clonedElement);
 }
 // Function: Delete contact from list
 function contactListDelete() {
