@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function(e) {
 function handleContactDelete(contactElement) {
     // Could do a modal prompt here before calling contactList Delete
     contactListDelete(contactElement);
-    
+
 }
 
 function handleContactEdit(contactElement) {
@@ -72,7 +72,6 @@ function handleContactEdit(contactElement) {
          }
     }
 }
-
 
 function handleContactCreate() {
     let errors,alertElement;
@@ -137,8 +136,8 @@ function contactListAdd(name,tel) {
     // Create a clone of contact element
     let clonedElement = document.getElementById("contactElementTemplate").cloneNode(true);
 
-    // Set new ID
-    clonedElement.id = "newContact"; 
+    // Make it visible by removing hide-class
+    clonedElement.classList.add("contactElement");
 
     // Make it visible by removing hide-class
     clonedElement.classList.remove("d-none");
@@ -154,6 +153,9 @@ function contactListAdd(name,tel) {
 
     // Save list
     contactListSave();
+
+    // Show clear button.
+    document.querySelector("#contactsClear").classList.remove("d-none");
 }
 
 // Function: Delete contact from list
@@ -162,6 +164,10 @@ function contactListDelete(contactElement) {
 
     // Save list
     contactListSave();
+
+    // Hide clear button if no more contacts
+    if (document.querySelectorAll('.contactElement').length===0)
+    document.querySelector("#contactsClear").classList.add("d-none");
 }
 
 // Function: Delete all contacts
