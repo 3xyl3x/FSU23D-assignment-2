@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", function (e) {
-    contactListLoad();
 
     document.querySelector("#contactCreate").addEventListener("click", handleContactCreate);
     
@@ -114,15 +113,6 @@ function handleContactCreate() {
     }
 }
 
-// Function: Load contact list from local storage
-function contactListLoad() {
-    console.log("Load list from local storage");
-}
-
-// Function: Save contact list to local storage
-function contactListSave() {
-    console.log("Save list to local storage");
-}
 
 // Function: Add contact to list
 function contactListAdd(name, tel) {
@@ -146,9 +136,7 @@ function contactListAdd(name, tel) {
 
     contactList.appendChild(clonedElement);
 
-    // Save list
-    contactListSave();
-
+ 
     // Show clear button.
     document.querySelector("#contactsClear").classList.remove("d-none");
 }
@@ -157,8 +145,6 @@ function contactListAdd(name, tel) {
 function contactListDelete(contactElement) {
     contactElement.remove();
 
-    // Save list
-    contactListSave();
 
     // Hide clear button if no more contacts
     if (document.querySelectorAll('.contactElement').length === 0)
