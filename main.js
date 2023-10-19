@@ -1,101 +1,88 @@
 document.addEventListener("DOMContentLoaded", function(e) {
-    
+    contactListLoad();
+
     document.querySelector("#contactCreate").addEventListener("click", handleContactCreate);
-    document.querySelectorAll('.validate').forEach(input => {
-        input.addEventListener('input', event => validate(event.target, event.target.dataset.validationType));
+    
+    document.body.addEventListener('input', function (event) {
+        if (event.target.classList.contains('validate')) {
+            validate(event.target, event.target.dataset.validationType);
+        }
     });
     
-
-
     // Add listener to contactList since list elements are dynamicly added
     document.getElementById('contactList').addEventListener('click', function(event) {
-
-
-        // Edit contact element
+        const contactElement = event.target.closest('li');
         if (event.target.classList.contains('contactEdit')) {
-            handleContactEdit(event);
-        }
-
-        // Delete contact element
-        if (event.target.classList.contains('contactDelete')) {
-        
-            handleContactDelete(event);
+            handleContactEdit(contactElement);
+        } else if (event.target.classList.contains('contactDelete')) {
+            handleContactDelete(contactElement);
         }
     });
-
-    
 });
 
-function handleContactDelete(event) {
-    let contactElement = event.target.closest('li');
-
-    contactElement.remove();
+function handleContactDelete(contactElement) {
+    // Could do a modal prompt here before calling contactList Delete
+    contactListDelete(contactElement);
+    
 }
 
-function handleContactEdit(event) {
-    let contactElement = event.target.closest('li');
-    let inputFields= contactElement.querySelectorAll('input');
-    let contactEditButton = event.target;
-    let contactEditMode = contactEditButton.getAttribute("data-mode");
+function handleContactEdit(contactElement) {
+    const inputFields = contactElement.querySelectorAll('input');
+    const contactEditButton = contactElement.querySelector('.contactEdit');
+    const contactEditMode = contactEditButton.getAttribute('data-mode');
 
-    switch(contactEditMode) {
-        case "edit":
-            contactEditButton.setAttribute("data-mode","save");
-            contactEditButton.classList.remove("btn-warning");
-            contactEditButton.classList.add("btn-success");
-            console.log(contactEditButton.classList);
-            contactEditButton.innerHTML="Spara";
-            inputFields.forEach(input => input.disabled = false);
-        break;
-        case "save":
-            contactEditButton.setAttribute("data-mode","edit");
-            contactEditButton.classList.remove("btn-success");
-            contactEditButton.classList.add("btn-warning");
-            contactEditButton.innerHTML="Ändra";
-            inputFields.forEach(input => input.disabled = true);
-        break;
+    if (contactEditMode === 'edit') {
+        contactEditButton.setAttribute('data-mode', 'save');
+        contactEditButton.classList.replace('btn-warning', 'btn-success');
+        contactEditButton.innerHTML = 'Spara';
+        inputFields.forEach(input => (input.disabled = false));
+    } else if (contactEditMode === 'save') {
+        contactEditButton.setAttribute('data-mode', 'edit');
+        contactEditButton.classList.replace('btn-success', 'btn-warning');
+        contactEditButton.innerHTML = 'Ändra';
+        inputFields.forEach(input => (input.disabled = true));
+
+        
     }
-
-    
 }
 
 
 function handleContactCreate() {
-    let name,tel,errors,alertElement;
-    name=document.querySelector("#inputName");
-    tel=document.querySelector("#inputTel");
+    let errors,alertElement;
+    const nameElement=document.querySelector("#inputName");
+    const telElement=document.querySelector("#inputTel");
     alertElement = document.querySelector('#contactCreateAlert');
     errors=[];
 
-    if (name.getAttribute("data-validated")!=="true"){
+    if (nameElement.getAttribute("data-validated")!=="true"){
         // Set error border, necessary if no input
-        inputSetBorder(name,"danger");
+        inputSetBorder(nameElement,"danger");
         errors.push("Ange ett korrekt namn!");
     }
-    if (tel.getAttribute("data-validated")!=="true"){
+    if (telElement.getAttribute("data-validated")!=="true"){
         // Set error border, necessary if no input
-        inputSetBorder(tel,"danger");
+        inputSetBorder(telElement,"danger");
         errors.push("Ange ett korrekt telefonnummer!");
     }
 
     // No errors
     if(errors.length===0){
         // Add the contact
-        contactListAdd(name.value,tel.value);
+        contactListAdd(nameElement.value,telElement.value);
         // Hide error element
         alertElement.classList.add("d-none");
 
         // Clear input values
-        name.value="";
-        tel.value="";
+        nameElement.value="";
+        telElement.value="";
 
         // Clear input borders
-        inputSetBorder(name,"normal");
-        inputSetBorder(tel,"normal");
+        inputSetBorder(nameElement,"normal");
+        inputSetBorder(telElement,"normal");
 
         // clear validation
-        name.setAttribute("data-validated",false);
-        tel.setAttribute("data-validated",false);
+        nameElement.setAttribute("data-validated",false);
+        telElement.setAttribute("data-validated",false);
     } else {
         // Show error element
         alertElement.classList.remove("d-none");
@@ -110,12 +97,12 @@ function handleContactCreate() {
 
 // Function: Load contactlist from local storage
 function contactListLoad() {
-
+    console.log("Load list from localstorage");
 }
 
 // Function: Save contactlist to local storage
 function contactListSave() {
-
+    console.log("Save list to localstorage");
 }
 
 // Function: Add contact to list
@@ -139,20 +126,28 @@ function contactListAdd(name,tel) {
     clonedElement.setAttribute("data-contactID", "custom-value");
 
     contactList.appendChild(clonedElement);
+
+    // Save list
+    contactListSave();
 }
 
 // Function: Delete contact from list
-function contactListDelete() {
-    
+function contactListDelete(contactElement) {
+    contactElement.remove();
+
+    // Save list
+    contactListSave();
 }
 
 // Function: Delete all contacts
 function contactListClear() {
-    
+
 }
 // Function: Edit contact in list
 function contactListEdit() {
-    
+
+    // Save list
+    contactListSave();   
 }
 
 
@@ -182,6 +177,7 @@ function validate(element,type) {
         inputSetBorder(element,"danger");
     }
 
+    console.log(`validating input. [value=${value}]  [valid=${valid}]`);
     return valid;
 }
 
