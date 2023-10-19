@@ -115,15 +115,22 @@ function contactCreate() {
 }
 
 function contactListAdd(name, tel) {
+    // Clone template elment
     const clonedElement = document.getElementById('contactElementTemplate').cloneNode(true);
     
+    // Add class
     clonedElement.classList.add('contactElement');
+    // Make visible
     clonedElement.classList.remove('d-none');
 
+    // Set the input values from arguments
     clonedElement.querySelector('.inputEditName').value = name;
     clonedElement.querySelector('.inputEditTel').value = tel;
     
+    // Append to contactlist
     contactList.appendChild(clonedElement);
+    
+    // Make sure clear list button is visible
     document.querySelector('#contactsClear').classList.remove('d-none');
 }
 
@@ -156,6 +163,7 @@ function validate(element) {
     inputSetBorder(element, valid ? 'success' : 'danger');
 }
 
+// Function to set borders (and focus shadows) 
 function inputSetBorder(inputElement, borderType) {
     inputElement.classList.remove('border-success', 'focus-ring-success', 'border-danger', 'focus-ring-danger');
     inputElement.classList.add(`focus-ring-${borderType}`, `border-${borderType}`);
