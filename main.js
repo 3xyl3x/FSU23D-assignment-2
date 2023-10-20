@@ -1,8 +1,10 @@
+// Set the fade duration
+const globalFadeDuration = 300;
+
 // Wait for DOM to be loaded before adding listeners
 document.addEventListener('DOMContentLoaded', function () {
     // Reference to the contactlist
     const contactList = document.getElementById('contactList');    
-
     // Listeners for create contact and clear list buttons
     document.querySelector('#contactCreate').addEventListener('click', contactCreate);
     document.querySelector('#contactsClear').addEventListener('click', contactListClear);
@@ -114,9 +116,15 @@ function contactCreate() {
 function contactListAdd(name, tel) {
     // Clone template elment
     const clonedElement = document.getElementById('contactElementTemplate').cloneNode(true);
-    
+    // Remove ID
+    clonedElement.id='';
     // Add class
-    clonedElement.classList.add('contactElement');
+    clonedElement.classList.add('contactElement')
+        fade(clonedElement, false);
+ 
+
+    
+
     // Make visible
     clonedElement.classList.remove('d-none');
 
@@ -129,15 +137,21 @@ function contactListAdd(name, tel) {
     
     // Make sure clear list button is visible
     document.querySelector('#contactsClear').classList.remove('d-none');
+   
 }
 
 function contactDelete(contactElement) {
-    // Remove element
+    fade(contactElement,true);
+      // Remove element after fadeout
+  setTimeout(function () {
     contactElement.remove();
-    // Hide clear list button if there is no more elements left
-    if (document.querySelectorAll('.contactElement').length === 0) {
-        document.querySelector('#contactsClear').classList.add('d-none');
-    }
+        // Hide clear list button if there is no more elements left
+        if (document.querySelectorAll('.contactElement').length === 0) {
+            document.querySelector('#contactsClear').classList.add('d-none');
+        }
+  }, globalFadeDuration); 
+   
+
 }
 
 function contactListClear() {
@@ -169,3 +183,21 @@ function inputSetBorder(inputElement, borderType) {
     inputElement.classList.add(`focus-ring-${borderType}`, `border-${borderType}`);
 }
 
+// Fade in/out function
+function fade(element, fadeOut = false) {
+    let start = null;
+    const targetOpacity = fadeOut ? 0 : 1;
+    const initialOpacity = fadeOut ? 1 : 0;
+
+      function step(timestamp) {
+        if (!start) start = timestamp;
+        const progress = (timestamp - start) / globalFadeDuration;
+        const currentOpacity = initialOpacity + (targetOpacity - initialOpacity) * Math.min(progress, 1);
+        element.style.opacity = currentOpacity;
+  
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        }
+      }
+      requestAnimationFrame(step);
+  }
