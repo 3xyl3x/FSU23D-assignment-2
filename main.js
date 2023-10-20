@@ -35,27 +35,24 @@ function contactEdit(contactElement) {
     if (contactEditMode === 'edit') {
         // Make inputs editable
         inputFields.forEach(input => (input.disabled = false));
+        // Change button to represent save function
         contactEditButton.classList.replace('btn-warning', 'btn-success');
         contactEditButton.querySelector('.editIcon').classList.add("d-none");
         contactEditButton.querySelector('.saveIcon').classList.remove("d-none");
-        // Switch to 'save' mode.
+        // Switch to 'save' mode on the button.
         contactEditButton.dataset.mode='save';
     } else if (contactEditMode === 'save') {
         const nameElement = contactElement.querySelector('.inputEditName');
         const telElement = contactElement.querySelector('.inputEditTel');
         const alertElement = contactElement.querySelector('.contactEditAlert');
-        const errors = [];
-
-        // Validate name and telephone.
-        validate(telElement);
-        validate(nameElement);
+        let errors = [];
 
         
         // Check if validation fails.
-        if (nameElement.dataset.validated !== 'true') {
+        if (!validate(nameElement)) {
             errors.push('Ange ett korrekt namn!');
         }
-        if (telElement.dataset.validated !== 'true') {
+        if (!validate(telElement)) {
             errors.push('Ange ett korrekt telefonnummer!');
         }
         
@@ -84,29 +81,29 @@ function contactCreate() {
     const nameElement = document.querySelector('#inputName');
     const telElement = document.querySelector('#inputTel');
     const alertElement = document.querySelector('#contactCreateAlert');
-    const errors = [];
-
-    // Validate name and telephone.
-    validate(nameElement);
-    validate(telElement);
+    let errors = [];
 
     // Check if validation fails.
-    if (nameElement.dataset.validated !== 'true') {
+    if (!validate(nameElement)) {
         errors.push('Ange ett korrekt namn!');
     }
-    if (telElement.dataset.validated !== 'true') {
+    if (!validate(telElement)) {
         errors.push('Ange ett korrekt telefonnummer!');
     }
-     // No errors
+
+     // If no errors
     if (errors.length === 0) {
+        // Add contact to list
         contactListAdd(nameElement.value, telElement.value);
+        // Hide error
         alertElement.classList.add('d-none');
+        // Empty inputs
         nameElement.value = '';
         telElement.value = '';
+        // Clear borders of inputs 
         inputSetBorder(nameElement, 'normal');
         inputSetBorder(telElement, 'normal');
-        nameElement.dataset.validated=false;
-        telElement.dataset.validated=false;
+
     } else {
          // Show errors.
         alertElement.classList.remove('d-none');
@@ -144,7 +141,7 @@ function contactDelete(contactElement) {
 }
 
 function contactListClear() {
-    // Run delete contact function on all elements
+    // Run delete contact function on all elements with a loop
     const contactElements = contactList.querySelectorAll('.contactElement');
     contactElements.forEach(contactElement => contactDelete(contactElement));
 }
@@ -158,12 +155,15 @@ function validate(element) {
     };
     // Check which validation type the input element has and use that pattern to test the value. 
     const valid = patterns[element.dataset.validationType].test(element.value);
-    // Set the attribute to the result
-    element.dataset.validated=valid;
+
+    // Set the border
     inputSetBorder(element, valid ? 'success' : 'danger');
+
+    // Return valid boolean
+    return valid;
 }
 
-// Function to set borders (and focus shadows) 
+// Function to set borders (and focus shadows) with bootstrap classes
 function inputSetBorder(inputElement, borderType) {
     inputElement.classList.remove('border-success', 'focus-ring-success', 'border-danger', 'focus-ring-danger');
     inputElement.classList.add(`focus-ring-${borderType}`, `border-${borderType}`);
